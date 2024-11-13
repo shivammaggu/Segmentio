@@ -43,6 +43,25 @@ final class SegmentioCustomCellWithLabel: SegmentioCell {
             constant: 0
         )
         bottomConstraint?.isActive = true
+        
+        NSLayoutConstraint(
+            item: containerView,
+            attribute: .leading,
+            relatedBy: .equal,
+            toItem: contentView,
+            attribute: .leading,
+            multiplier: 1,
+            constant: 0
+        ).isActive = true
+        
+        NSLayoutConstraint(
+            item: containerView,
+            attribute: .trailing,
+            relatedBy: .equal,
+            toItem: contentView,
+            attribute: .trailing,
+            multiplier: 1,
+            constant: 0
+        ).isActive = true
     }
-
 }
