@@ -233,15 +233,6 @@ class SegmentioCell: UICollectionViewCell {
             return
         }
         
-        let segmentTitleLabelVerticalCenterConstraint = NSLayoutConstraint(
-            item: segmentTitleLabel,
-            attribute: .centerY,
-            relatedBy: .equal,
-            toItem: containerView,
-            attribute: .centerY,
-            multiplier: 1,
-            constant: 0
-        )
         let segmentTitleLabelTrailingConstraint = NSLayoutConstraint(
             item: segmentTitleLabel,
             attribute: .trailing,
@@ -263,7 +254,6 @@ class SegmentioCell: UICollectionViewCell {
         
         addConstraints([
             segmentTitleLabelTrailingConstraint,
-            segmentTitleLabelVerticalCenterConstraint,
             segmentTitleLabelLeadingConstraint
         ])
     }

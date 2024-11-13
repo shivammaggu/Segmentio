@@ -20,14 +20,6 @@ final class SegmentioCustomCellWithLabel: SegmentioCell {
         
         // main constraints
         
-        let segmentTitleLabelHorizontConstraint = NSLayoutConstraint.constraints(
-            withVisualFormat: "|[containerView]|",
-            options: [.alignAllCenterX],
-            metrics: nil,
-            views: views
-        )
-        NSLayoutConstraint.activate(segmentTitleLabelHorizontConstraint)
-        
         // custom constraints
         
         topConstraint = NSLayoutConstraint(
@@ -37,7 +29,7 @@ final class SegmentioCustomCellWithLabel: SegmentioCell {
             toItem: contentView,
             attribute: .top,
             multiplier: 1,
-            constant: padding
+            constant: 0
         )
         topConstraint?.isActive = true
         
@@ -48,7 +40,7 @@ final class SegmentioCustomCellWithLabel: SegmentioCell {
             toItem: containerView,
             attribute: .bottom,
             multiplier: 1,
-            constant: padding
+            constant: 0
         )
         bottomConstraint?.isActive = true
     }
