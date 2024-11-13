@@ -46,10 +46,10 @@ public struct SegmentioItem {
 
 public struct SegmentioState {
     
-    var backgroundColor: UIColor
-    var titleFont: UIFont
-    var titleTextColor: UIColor
-    var titleAlpha: CGFloat
+    public var backgroundColor: UIColor
+    public var titleFont: UIFont
+    public var titleTextColor: UIColor
+    public var titleAlpha: CGFloat
     
     public init(
         backgroundColor: UIColor = .clear,
@@ -143,7 +143,7 @@ public enum SegmentioPosition {
 
 public enum SegmentioStyle: String {
     
-    case onlyLabel, onlyImage, imageOverLabel, imageUnderLabel, imageBeforeLabel, imageAfterLabel
+    case onlyLabel, onlyImage, imageOverLabel, imageUnderLabel, imageBeforeLabel, imageAfterLabel, onlyCustomLabel
     
     public static let allStyles = [
         onlyLabel,
@@ -151,12 +151,13 @@ public enum SegmentioStyle: String {
         imageOverLabel,
         imageUnderLabel,
         imageBeforeLabel,
-        imageAfterLabel
+        imageAfterLabel,
+        onlyCustomLabel
     ]
     
     public func isWithText() -> Bool {
         switch self {
-        case .onlyLabel, .imageOverLabel, .imageUnderLabel, .imageBeforeLabel, .imageAfterLabel:
+        case .onlyLabel, .imageOverLabel, .imageUnderLabel, .imageBeforeLabel, .imageAfterLabel, .onlyCustomLabel:
             return true
         default:
             return false
@@ -177,6 +178,8 @@ public enum SegmentioStyle: String {
         switch self {
         case .onlyLabel, .imageAfterLabel, .imageBeforeLabel, .imageOverLabel, .imageUnderLabel:
             return 4 * defaultLayoutMargins
+        case .onlyCustomLabel:
+            return 0
         case .onlyImage:
             return 2 * defaultLayoutMargins
         }
@@ -200,6 +203,7 @@ public struct SegmentioOptions {
     var states: SegmentioStates
     var animationDuration: CFTimeInterval
     var userInterractionEnabled: Bool
+    var minimumInterimSpacing: CGFloat
 
     public init() {
         self.backgroundColor = .lightGray
@@ -216,6 +220,7 @@ public struct SegmentioOptions {
                                         highlightedState: SegmentioState())
         self.animationDuration = 0.1
         self.userInterractionEnabled = true
+        self.minimumInterimSpacing = 0
     }
 
     public init(backgroundColor: UIColor = .lightGray,
@@ -231,7 +236,8 @@ public struct SegmentioOptions {
                                                                  selectedState: SegmentioState(),
                                                                  highlightedState: SegmentioState()),
                 animationDuration: CFTimeInterval = 0.1,
-                userInterractionEnabled: Bool = true) {
+                userInterractionEnabled: Bool = true,
+                minimumInterimSpacing: CGFloat = 0) {
         self.backgroundColor = backgroundColor
         self.segmentPosition = segmentPosition
         self.scrollEnabled = scrollEnabled
@@ -244,5 +250,6 @@ public struct SegmentioOptions {
         self.states = segmentStates
         self.animationDuration = animationDuration
         self.userInterractionEnabled = userInterractionEnabled
+        self.minimumInterimSpacing = minimumInterimSpacing
     }
 }

@@ -179,6 +179,12 @@ class SegmentioCell: UICollectionViewCell {
         setupImageContainerConstraints()
         return // implement in subclasses
     }
+    
+    func setupCustomConstraintsForSubviews() {
+        setupCustomContainerConstraints()
+        setupImageContainerConstraints()
+        return // implement in subclasses
+    }
 
     // MARK: - Private functions
     
@@ -211,6 +217,46 @@ class SegmentioCell: UICollectionViewCell {
             relatedBy: .equal,
             toItem: containerView,
             attribute: .leadingMargin,
+            multiplier: 1.0,
+            constant: 0
+        )
+        
+        addConstraints([
+            segmentTitleLabelTrailingConstraint,
+            segmentTitleLabelVerticalCenterConstraint,
+            segmentTitleLabelLeadingConstraint
+        ])
+    }
+    
+    private func setupCustomContainerConstraints() {
+        guard let segmentTitleLabel = segmentTitleLabel, let containerView = containerView else {
+            return
+        }
+        
+        let segmentTitleLabelVerticalCenterConstraint = NSLayoutConstraint(
+            item: segmentTitleLabel,
+            attribute: .centerY,
+            relatedBy: .equal,
+            toItem: containerView,
+            attribute: .centerY,
+            multiplier: 1,
+            constant: 0
+        )
+        let segmentTitleLabelTrailingConstraint = NSLayoutConstraint(
+            item: segmentTitleLabel,
+            attribute: .trailing,
+            relatedBy: .equal,
+            toItem: containerView,
+            attribute: .trailing,
+            multiplier: 1.0,
+            constant: 0
+        )
+        let segmentTitleLabelLeadingConstraint = NSLayoutConstraint(
+            item: segmentTitleLabel,
+            attribute: .leading,
+            relatedBy: .equal,
+            toItem: containerView,
+            attribute: .leading,
             multiplier: 1.0,
             constant: 0
         )

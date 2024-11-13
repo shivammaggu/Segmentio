@@ -218,6 +218,8 @@ open class Segmentio: UIView {
                 return SegmentioCellWithImageBeforeLabel.self
             case .imageAfterLabel:
                 return SegmentioCellWithImageAfterLabel.self
+            case .onlyCustomLabel:
+                return SegmentioCustomCellWithLabel.self
             }
         }
         
@@ -366,7 +368,8 @@ open class Segmentio: UIView {
                 position: segmentioOptions.segmentPosition,
                 style: segmentioStyle,
                 insets: superviewInsets,
-                isCommonBehaviour: isCommonBehaviour
+                isCommonBehaviour: isCommonBehaviour, 
+                minimumInterimSpacing: self.segmentioOptions.minimumInterimSpacing
             )
             let insetX = ((points.endPoint.x - points.startPoint.x) - (item.endX - item.startX)) / 2
             
@@ -394,7 +397,8 @@ open class Segmentio: UIView {
                 position: segmentioOptions.segmentPosition,
                 style: segmentioStyle,
                 insets: superviewInsets,
-                isCommonBehaviour: isCommonBehaviour
+                isCommonBehaviour: isCommonBehaviour, 
+                minimumInterimSpacing: self.segmentioOptions.minimumInterimSpacing
             )
 
             moveShapeLayer(
@@ -533,8 +537,9 @@ open class Segmentio: UIView {
                 dynamicWidth += Segmentio.intrinsicWidth(for: item, style: segmentioStyle)
             }
             let itemWidth = Segmentio.intrinsicWidth(for: segmentioItems[indexPath.row], style: segmentioStyle)
+            let minimumInterimSpacing = self.segmentioOptions.minimumInterimSpacing * CGFloat(segmentioItems.count - 1)
             width = dynamicWidth > collectionViewWidth ? itemWidth
-                : itemWidth + ((collectionViewWidth - dynamicWidth) / CGFloat(segmentioItems.count))
+            : itemWidth + ((collectionViewWidth - dynamicWidth - minimumInterimSpacing) / CGFloat(segmentioItems.count))
         }
         
         return width
@@ -667,6 +672,10 @@ extension Segmentio: UICollectionViewDelegateFlowLayout {
         return CGSize(width: segmentWidth(for: indexPath), height: collectionView.frame.height)
     }
     
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return self.segmentioOptions.minimumInterimSpacing
+    }
+    
 }
 
 // MARK: - UIScrollViewDelegate
@@ -708,7 +717,7 @@ extension Segmentio: UIScrollViewDelegate {
 
 extension Segmentio.Points {
     
-    init(item: Segmentio.ItemInSuperview, atIndex index: Int, allItemsCellWidth: [CGFloat], pointY: CGFloat, position: SegmentioPosition, style: SegmentioStyle, insets: UIEdgeInsets, isCommonBehaviour: Bool) {
+    init(item: Segmentio.ItemInSuperview, atIndex index: Int, allItemsCellWidth: [CGFloat], pointY: CGFloat, position: SegmentioPosition, style: SegmentioStyle, insets: UIEdgeInsets, isCommonBehaviour: Bool, minimumInterimSpacing: CGFloat) {
         let separatorWidth: CGFloat = 1
         let cellWidth = item.cellFrameInSuperview.width
         var startX = item.startX
@@ -718,8 +727,8 @@ extension Segmentio.Points {
         var i = 0
 
         allItemsCellWidth.forEach { width in
-            if i < index { spaceBefore += width }
-            if i > index { spaceAfter += width }
+            if i < index { spaceBefore += (width + minimumInterimSpacing) }
+            if i > index { spaceAfter += (width + minimumInterimSpacing) }
             i += 1
         }
         // Cell will try to position itself in the middle, unless it can't because
