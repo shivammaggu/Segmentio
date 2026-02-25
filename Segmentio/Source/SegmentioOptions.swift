@@ -115,19 +115,24 @@ public enum SegmentioIndicatorType {
 
 public struct SegmentioIndicatorOptions {
     
-    var type: SegmentioIndicatorType
-    var ratio: CGFloat
-    var height: CGFloat
-    var color: UIColor
-    var roundedCorners: Bool
+    public var type: SegmentioIndicatorType
+    public var ratio: CGFloat
+    public var height: CGFloat
+    public var color: UIColor
+    public var roundedCorners: Bool
+    public var cornerRadius: CGFloat
+    public var corners: UIRectCorner
     
     public init(type: SegmentioIndicatorType = .bottom, ratio: CGFloat = 1, height: CGFloat = 2,
-                color: UIColor = .orange, roundedCorners: Bool = false) {
+                color: UIColor = .orange, roundedCorners: Bool = false, cornerRadius: CGFloat = 0,
+                corners: UIRectCorner = []) {
         self.type = type
         self.ratio = ratio
         self.height = height
         self.color = color
         self.roundedCorners = roundedCorners
+        self.cornerRadius = cornerRadius
+        self.corners = corners
     }
     
 }

@@ -96,7 +96,9 @@ struct SegmentioBuilder {
             type: .bottom,
             ratio: 1,
             height: 5,
-            color: ColorPalette.coral
+            color: ColorPalette.coral,
+            roundedCorners: true,
+            cornerRadius: 8
         )
     }
     
