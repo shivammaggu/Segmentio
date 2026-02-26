@@ -13,15 +13,22 @@ import UIKit
 public struct SegmentioItem {
     
     public var title: String?
+    public var font: UIFont?
     public var image: UIImage?
     public var selectedImage: UIImage?
     public var badgeCount: Int?
     public var badgeColor: UIColor?
     public var intrinsicWidth: CGFloat {
-        let label = UILabel()
-        label.text = self.title
-        label.sizeToFit()
-        return label.intrinsicContentSize.width
+        guard let title = self.title else { return 0 }
+
+        let font = self.font ?? UIFont.systemFont(ofSize: 14)
+
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: font
+        ]
+
+        let width = (title as NSString).size(withAttributes: attributes).width
+        return ceil(width)
     }
 
     public init(title: String?, image: UIImage?, selectedImage: UIImage? = nil) {
@@ -209,6 +216,8 @@ public struct SegmentioOptions {
     var animationDuration: CFTimeInterval
     var userInterractionEnabled: Bool
     var minimumInterimSpacing: CGFloat
+    var minimumScaleFactor: CGFloat
+    var adjustsFontSizeToFitWidth: Bool
 
     public init() {
         self.backgroundColor = .lightGray
@@ -226,6 +235,8 @@ public struct SegmentioOptions {
         self.animationDuration = 0.1
         self.userInterractionEnabled = true
         self.minimumInterimSpacing = 0
+        self.minimumScaleFactor = 0.5
+        self.adjustsFontSizeToFitWidth = false
     }
 
     public init(backgroundColor: UIColor = .lightGray,
@@ -242,7 +253,9 @@ public struct SegmentioOptions {
                                                                  highlightedState: SegmentioState()),
                 animationDuration: CFTimeInterval = 0.1,
                 userInterractionEnabled: Bool = true,
-                minimumInterimSpacing: CGFloat = 0) {
+                minimumInterimSpacing: CGFloat = 0,
+                minimumScaleFactor: CGFloat = 0.5,
+                adjustsFontSizeToFitWidth: Bool = false) {
         self.backgroundColor = backgroundColor
         self.segmentPosition = segmentPosition
         self.scrollEnabled = scrollEnabled
@@ -256,5 +269,7 @@ public struct SegmentioOptions {
         self.animationDuration = animationDuration
         self.userInterractionEnabled = userInterractionEnabled
         self.minimumInterimSpacing = minimumInterimSpacing
+        self.minimumScaleFactor = minimumScaleFactor
+        self.adjustsFontSizeToFitWidth = adjustsFontSizeToFitWidth
     }
 }

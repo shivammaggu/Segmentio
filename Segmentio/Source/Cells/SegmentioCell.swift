@@ -142,8 +142,8 @@ class SegmentioCell: UICollectionViewCell {
             segmentTitleLabel?.textColor = selected ? selectedState.titleTextColor : defaultState.titleTextColor
             segmentTitleLabel?.font = selected ? selectedState.titleFont : defaultState.titleFont
             segmentTitleLabel?.alpha = selected ? selectedState.titleAlpha : defaultState.titleAlpha
-            segmentTitleLabel?.minimumScaleFactor = 0.5
-            segmentTitleLabel?.adjustsFontSizeToFitWidth = true
+            segmentTitleLabel?.minimumScaleFactor = options.minimumScaleFactor
+            segmentTitleLabel?.adjustsFontSizeToFitWidth = options.adjustsFontSizeToFitWidth
         }
                 
         if (style != .onlyLabel) {
@@ -353,8 +353,8 @@ class SegmentioCell: UICollectionViewCell {
             segmentTitleLabel?.textColor = defaultState.titleTextColor
             segmentTitleLabel?.font = defaultState.titleFont
             segmentTitleLabel?.text = content.title
-            segmentTitleLabel?.minimumScaleFactor = 0.5
-            segmentTitleLabel?.adjustsFontSizeToFitWidth = true
+            segmentTitleLabel?.minimumScaleFactor = options.minimumScaleFactor
+            segmentTitleLabel?.adjustsFontSizeToFitWidth = options.adjustsFontSizeToFitWidth
         }
     }
     
