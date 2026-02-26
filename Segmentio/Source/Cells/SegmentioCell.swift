@@ -179,6 +179,12 @@ class SegmentioCell: UICollectionViewCell {
         setupImageContainerConstraints()
         return // implement in subclasses
     }
+    
+    func setupCustomConstraintsForSubviews() {
+        setupCustomContainerConstraints()
+        setupImageContainerConstraints()
+        return // implement in subclasses
+    }
 
     // MARK: - Private functions
     
@@ -219,6 +225,58 @@ class SegmentioCell: UICollectionViewCell {
             segmentTitleLabelTrailingConstraint,
             segmentTitleLabelVerticalCenterConstraint,
             segmentTitleLabelLeadingConstraint
+        ])
+    }
+    
+    private func setupCustomContainerConstraints() {
+        guard let segmentTitleLabel = segmentTitleLabel, let containerView = containerView else {
+            return
+        }
+        
+        let segmentTitleLabelTrailingConstraint = NSLayoutConstraint(
+            item: segmentTitleLabel,
+            attribute: .trailing,
+            relatedBy: .equal,
+            toItem: containerView,
+            attribute: .trailing,
+            multiplier: 1.0,
+            constant: 0
+        )
+        let segmentTitleLabelLeadingConstraint = NSLayoutConstraint(
+            item: segmentTitleLabel,
+            attribute: .leading,
+            relatedBy: .equal,
+            toItem: containerView,
+            attribute: .leading,
+            multiplier: 1.0,
+            constant: 0
+        )
+        
+        let segmentTitleLabelTopConstraint = NSLayoutConstraint(
+            item: segmentTitleLabel,
+            attribute: .top,
+            relatedBy: .equal,
+            toItem: containerView,
+            attribute: .top,
+            multiplier: 1.0,
+            constant: 0
+        )
+        
+        let segmentTitleLabelBottomConstraint = NSLayoutConstraint(
+            item: segmentTitleLabel,
+            attribute: .bottom,
+            relatedBy: .equal,
+            toItem: containerView,
+            attribute: .bottom,
+            multiplier: 1.0,
+            constant: 0
+        )
+        
+        addConstraints([
+            segmentTitleLabelTrailingConstraint,
+            segmentTitleLabelLeadingConstraint,
+            segmentTitleLabelBottomConstraint,
+            segmentTitleLabelTopConstraint
         ])
     }
     
