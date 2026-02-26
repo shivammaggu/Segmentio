@@ -135,9 +135,28 @@ SegmentioIndicatorOptions(
             type: .bottom,
             ratio: 1,
             height: 5,
-            color: .orange
+            color: .orange,
+            roundedCorners: false,
+            cornerRadius: 0
 )
 ```
+
+To create an indicator with rounded **top-left and top-right corners only**, set both `roundedCorners: true` and provide a `cornerRadius` value:
+
+```swift
+SegmentioIndicatorOptions(
+            type: .bottom,
+            ratio: 1,
+            height: 5,
+            color: .orange,
+            roundedCorners: true,
+            cornerRadius: 8  // Rounds only top corners
+)
+```
+
+**Note:** 
+- When `cornerRadius` is `0`, the indicator uses the default line-based approach with rounded line caps (if `roundedCorners: true`)
+- When `cornerRadius > 0`, the indicator becomes a filled rectangle with curved top-left and top-right corners only
 
 Horizontal borders can be customized by passing an instance of `SegmentioHorizontalSeparatorOptions`:
 

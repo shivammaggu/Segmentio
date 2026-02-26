@@ -38,7 +38,7 @@ open class Segmentio: UIView {
     }
 
     open private(set) var segmentioItems = [SegmentioItem]()
-    private var segmentioCollectionView: UICollectionView?
+    private(set) public var segmentioCollectionView: UICollectionView?
     private var segmentioOptions = SegmentioOptions()
     private var segmentioStyle = SegmentioStyle.imageOverLabel
     private var isPerformingScrollAnimation = false
@@ -326,10 +326,18 @@ open class Segmentio: UIView {
 
     private func setupShapeLayer(shapeLayer: CAShapeLayer, backgroundColor: UIColor, height: CGFloat,
                                  sublayer: CALayer, rounded: Bool = false) {
-        shapeLayer.fillColor = backgroundColor.cgColor
-        shapeLayer.strokeColor = backgroundColor.cgColor
-        shapeLayer.lineWidth = height
-        shapeLayer.lineCap = rounded ? .round : .butt
+        // When using rounded corners with cornerRadius, we use fill instead of stroke
+        if rounded, let indicatorOptions = segmentioOptions.indicatorOptions, indicatorOptions.cornerRadius > 0 {
+            shapeLayer.fillColor = backgroundColor.cgColor
+            shapeLayer.strokeColor = nil
+            shapeLayer.lineWidth = 0
+        } else {
+            // Original line-based approach
+            shapeLayer.fillColor = backgroundColor.cgColor
+            shapeLayer.strokeColor = backgroundColor.cgColor
+            shapeLayer.lineWidth = height
+            shapeLayer.lineCap = rounded ? .round : .butt
+        }
         layer.insertSublayer(shapeLayer, below: sublayer)
     }
     
@@ -374,8 +382,10 @@ open class Segmentio: UIView {
             let insetX = ((points.endPoint.x - points.startPoint.x) - (item.endX - item.startX)) / 2
             
             // check rounded property
-            let roundedCorners = segmentioOptions.indicatorOptions?.roundedCorners ?? false
-            let lineCapSize = roundedCorners ? (segmentioOptions.indicatorOptions?.height ?? 0) / 2 : 0
+            let roundedCorners = options.roundedCorners
+            
+            // Only apply lineCapSize for line-based rounded corners (not rectangle with cornerRadius)
+            let lineCapSize = (roundedCorners && options.cornerRadius == 0) ? options.height / 2 : 0
 
             moveShapeLayer(
                 indicatorLayer,
@@ -452,10 +462,32 @@ open class Segmentio: UIView {
         var endPointWithVerticalSeparator = endPoint
         endPointWithVerticalSeparator.x = endPoint.x - 1
         
-        let shapeLayerPath = UIBezierPath()
-        shapeLayerPath.move(to: startPoint)
-        shapeLayerPath.addLine(to: endPointWithVerticalSeparator)
-        shapeLayerPath.lineCapStyle = roundedCorners ? .round : .butt
+        let shapeLayerPath: UIBezierPath
+        
+        // Check if we should use rounded top corners
+        if roundedCorners, let indicatorOptions = segmentioOptions.indicatorOptions, indicatorOptions.cornerRadius > 0, !indicatorOptions.corners.isEmpty {
+            // Create a rectangle with rounded top corners only
+            let width = endPointWithVerticalSeparator.x - startPoint.x
+            let height = indicatorOptions.height
+            let cornerRadius = indicatorOptions.cornerRadius
+            
+            // Calculate the rect for the indicator
+            let rectY = startPoint.y - height / 2
+            let rect = CGRect(x: startPoint.x, y: rectY, width: width, height: height)
+            
+            // Create path with rounded top corners only
+            shapeLayerPath = UIBezierPath(
+                roundedRect: rect,
+                byRoundingCorners: indicatorOptions.corners,
+                cornerRadii: CGSize(width: cornerRadius, height: cornerRadius)
+            )
+        } else {
+            // Use the original line-based approach
+            shapeLayerPath = UIBezierPath()
+            shapeLayerPath.move(to: startPoint)
+            shapeLayerPath.addLine(to: endPointWithVerticalSeparator)
+            shapeLayerPath.lineCapStyle = roundedCorners ? .round : .butt
+        }
         
         if animated {
             isPerformingScrollAnimation = true
@@ -532,20 +564,37 @@ open class Segmentio: UIView {
                 break
             }
             
+            let defaultFont = self.segmentioOptions.states.defaultState.titleFont
+            let highlightedFont = self.segmentioOptions.states.highlightedState.titleFont
+            let selectedFont = self.segmentioOptions.states.selectedState.titleFont
+            let fonts = [defaultFont, highlightedFont, selectedFont]
+            let maxFont = fonts.max(by: { $0.pointSize < $1.pointSize })
+            
             var dynamicWidth: CGFloat = 0
             for item in segmentioItems {
+                var item = item
+                item.font = maxFont
                 dynamicWidth += Segmentio.intrinsicWidth(for: item, style: segmentioStyle)
             }
-            let itemWidth = Segmentio.intrinsicWidth(for: segmentioItems[indexPath.row], style: segmentioStyle)
-            let minimumInterimSpacing = self.segmentioOptions.minimumInterimSpacing * CGFloat(segmentioItems.count - 1)
-            width = dynamicWidth > collectionViewWidth ? itemWidth
-            : itemWidth + ((collectionViewWidth - dynamicWidth - minimumInterimSpacing) / CGFloat(segmentioItems.count))
+            var item = segmentioItems[indexPath.row]
+            item.font = maxFont
+            let itemWidth = Segmentio.intrinsicWidth(for: item, style: segmentioStyle)
+            let totalSpacing = segmentioOptions.minimumInterimSpacing * CGFloat(segmentioItems.count - 1)
+            let requiredWidth = dynamicWidth + totalSpacing
+
+            if requiredWidth > collectionViewWidth {
+                width = itemWidth // don't distribute, allow scrolling
+            } else {
+                let extraSpace = collectionViewWidth - requiredWidth
+                let distributed = extraSpace / CGFloat(segmentioItems.count)
+                width = itemWidth + distributed
+            }
         }
         
         return width
     }
 
-    private static func intrinsicWidth(for item: SegmentioItem, style: SegmentioStyle) -> CGFloat {
+    public static func intrinsicWidth(for item: SegmentioItem, style: SegmentioStyle) -> CGFloat {
         var itemWidth = style.isWithText() ? item.intrinsicWidth : (item.image?.size.width ?? 0)
         itemWidth += style.layoutMargins
         
@@ -689,12 +738,17 @@ extension Segmentio: UIScrollViewDelegate {
 
         if let options = segmentioOptions.indicatorOptions, let indicatorLayer = indicatorLayer {
             let item = itemInSuperview(ratio: options.ratio)
+            
+            // Use consistent logic with moveShapeLayerAtContext
+            let roundedCorners = options.roundedCorners
+            let lineCapSize = (roundedCorners && options.cornerRadius == 0) ? options.height / 2 : 0
+            
             moveShapeLayer(
                 indicatorLayer,
-                startPoint: CGPoint(x: item.startX, y: indicatorPointY()),
-                endPoint: CGPoint(x: item.endX, y: indicatorPointY()),
+                startPoint: CGPoint(x: item.startX + lineCapSize, y: indicatorPointY()),
+                endPoint: CGPoint(x: item.endX - lineCapSize, y: indicatorPointY()),
                 animated: false,
-                roundedCorners: true
+                roundedCorners: roundedCorners
             )
         }
         
