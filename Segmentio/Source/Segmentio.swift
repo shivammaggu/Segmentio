@@ -376,7 +376,7 @@ open class Segmentio: UIView {
                 position: segmentioOptions.segmentPosition,
                 style: segmentioStyle,
                 insets: superviewInsets,
-                isCommonBehaviour: isCommonBehaviour, 
+                isCommonBehaviour: isCommonBehaviour,
                 minimumInterimSpacing: self.segmentioOptions.minimumInterimSpacing
             )
             let insetX = ((points.endPoint.x - points.startPoint.x) - (item.endX - item.startX)) / 2
@@ -407,7 +407,7 @@ open class Segmentio: UIView {
                 position: segmentioOptions.segmentPosition,
                 style: segmentioStyle,
                 insets: superviewInsets,
-                isCommonBehaviour: isCommonBehaviour, 
+                isCommonBehaviour: isCommonBehaviour,
                 minimumInterimSpacing: self.segmentioOptions.minimumInterimSpacing
             )
 
@@ -571,13 +571,22 @@ open class Segmentio: UIView {
             let maxFont = fonts.max(by: { $0.pointSize < $1.pointSize })
             
             var dynamicWidth: CGFloat = 0
-            for item in segmentioItems {
+            for (index, item) in segmentioItems.enumerated() {
                 var item = item
-                item.font = maxFont
-                dynamicWidth += Segmentio.intrinsicWidth(for: item, style: segmentioStyle)
+                if index == self.selectedSegmentioIndex {
+                    item.font = maxFont
+                } else {
+                    item.font = defaultFont
+                }
+                let width = Segmentio.intrinsicWidth(for: item, style: segmentioStyle)
+                dynamicWidth += width
             }
             var item = segmentioItems[indexPath.row]
-            item.font = maxFont
+            if indexPath.row == self.selectedSegmentioIndex {
+                item.font = maxFont
+            } else {
+                item.font = defaultFont
+            }
             let itemWidth = Segmentio.intrinsicWidth(for: item, style: segmentioStyle)
             let totalSpacing = segmentioOptions.minimumInterimSpacing * CGFloat(segmentioItems.count - 1)
             let requiredWidth = dynamicWidth + totalSpacing
